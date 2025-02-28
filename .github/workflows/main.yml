@@ -15,7 +15,7 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Set-up Node.js
+      - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version: 18
@@ -24,7 +24,7 @@ jobs:
         run: npm install
 
       - name: Run test
-        run: npm test  # Fix incorrect command
+        run: npm test  # Changed from 'run test' to 'npm test'
 
   build-and-push:
     needs: test
@@ -32,13 +32,21 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+      
+      # Debugging Step: Check if secrets are set
+      - name: Debug Secrets
+        run: |
+          echo "DOCKER_USERNAME is set"
+          echo "DOCKER_PASSWORD length: ${#DOCKER_PASSWORD}"
+        env:
+          DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+          DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
 
       - name: Dockerhub login
         run: echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
 
-
-      - name: Build docker Image
+      - name: Build Docker Image
         run: docker build -t namanksolves/github-actions-demo:latest .
 
-      - name: Push the image to Dockerhub
+      - name: Push the image to DockerHub
         run: docker push namanksolves/github-actions-demo:latest
